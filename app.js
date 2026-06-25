@@ -1,12 +1,11 @@
 import ReactDOM from 'react-dom/client';
 import React, { useRef, useState } from 'react';
 const NAV = ['Dashboard', 'Admin Settings', 'Students', 'Staff', 'Fee Manager', 'Exam Manager', 'Attendance', 'Transport', 'Communication', 'Complaints', 'Reports'];
-const initials = { Dashboard: '▦', 'Admin Settings': '⚙', Students: '🎓', Staff: '👥', 'Fee Manager': '₹', 'Exam Manager': '✓', Attendance: '📅', Transport: '🚌', Communication: '✉', Complaints: '⚠', Reports: '▤' };
-const students = [{ id: 'VJC-2026-001', name: 'Aarav Sharma', admission: 'ADM26001', roll: '101', class: 'Junior Inter', section: 'A', course: 'MPC', mobile: '98765 43210', email: 'aarav@values.edu', dob: '2009-04-18', guardian: 'Rajesh Sharma', parentMobile: '98765 43211', address: 'Hyderabad, Telangana', status: 'Active' }, { id: 'VJC-2026-002', name: 'Diya Reddy', admission: 'ADM26002', roll: '102', class: 'Junior Inter', section: 'A', course: 'BiPC', mobile: '98765 12340', email: 'diya@values.edu', dob: '2009-08-22', guardian: 'Suresh Reddy', parentMobile: '98765 12341', address: 'Hyderabad, Telangana', status: 'Active' }, { id: 'VJC-2026-003', name: 'Kabir Rao', admission: 'ADM26003', roll: '205', class: 'Senior Inter', section: 'B', course: 'MEC', mobile: '98490 77881', email: 'kabir@values.edu', dob: '2008-11-04', guardian: 'Meera Rao', parentMobile: '98490 77882', address: 'Secunderabad, Telangana', status: 'Active' }, { id: 'VJC-2026-004', name: 'Ananya Iyer', admission: 'ADM26004', roll: '211', class: 'Senior Inter', section: 'A', course: 'CEC', mobile: '99887 22116', email: 'ananya@values.edu', dob: '2008-06-15', guardian: 'Vikram Iyer', parentMobile: '99887 22117', address: 'Hyderabad, Telangana', status: 'Active' }];
-const rows = { Students: students.map(s => [s.id, s.name, s.class, s.course, s.mobile, s.status]), Staff: [['STF-014', 'Dr. R. Mehta', 'Sciences', 'Physics', 'Active'], ['STF-021', 'Ms. S. Nair', 'Sciences', 'Chemistry', 'Active']], 'Fee Manager': [['VJC-R-1048', 'Aarav Sharma', 'INR 48,000', 'INR 13,000', 'UPI'], ['VJC-R-1047', 'Diya Reddy', 'INR 52,000', 'INR 0', 'Bank Transfer']], 'Exam Manager': [['Unit Test I', 'Junior Inter', 'Mathematics', '08 Jul 2026', 'Scheduled'], ['Quarterly', 'Senior Inter', 'Economics', '22 Aug 2026', 'Draft']], Attendance: [['Aarav Sharma', '101', 'Junior Inter', '20 / 22', '91%'], ['Diya Reddy', '102', 'Junior Inter', '21 / 22', '95%'], ['Kabir Rao', '205', 'Senior Inter', '18 / 22', '82%']], Transport: [['TS 09 AB 4421', 'M. Ramesh', 'Kukatpally', '8 stops', '42 students'], ['TS 10 CD 8310', 'K. Anand', 'Miyapur', '11 stops', '38 students']], Communication: [['Quarterly exam schedule', 'All Students', 'Principal', '25 Jun 2026', 'Sent'], ['Fee payment reminder', 'Junior Inter A', 'Accounts', '23 Jun 2026', 'Sent']], Complaints: [['CMP-028', 'Student 102', 'Library access card', '25 Jun 2026', 'Processing'], ['CMP-027', 'Staff STF-021', 'Lab equipment request', '24 Jun 2026', 'Pending']], Reports: [['Fee Collection Summary', 'Fees', 'June 2026', 'PDF / Excel'], ['Student Attendance', 'Attendance', 'June 2026', 'PDF / Print'], ['Class-wise Performance', 'Exams', 'Quarterly', 'PDF / Excel']] };
+const icons = { Dashboard: '▦', 'Admin Settings': '⚙', Students: '🎓', Staff: '👥', 'Fee Manager': '₹', 'Exam Manager': '✓', Attendance: '📅', Transport: '🚌', Communication: '✉', Complaints: '⚠', Reports: '▤' };
 const cols = { Students: ['Student ID', 'Name', 'Class', 'Course', 'Mobile', 'Status'], Staff: ['Staff ID', 'Name', 'Department', 'Subject', 'Status'], 'Fee Manager': ['Receipt', 'Student', 'Total', 'Balance', 'Mode'], 'Exam Manager': ['Exam', 'Class', 'Subject', 'Date', 'Status'], Attendance: ['Student', 'Roll', 'Class', 'Present', 'Percentage'], Transport: ['Bus', 'Driver', 'Route', 'Stops', 'Students'], Communication: ['Subject', 'Audience', 'Sender', 'Date', 'Status'], Complaints: ['ID', 'Raised By', 'Subject', 'Date', 'Status'], Reports: ['Report', 'Module', 'Period', 'Formats'] };
-const subtitles = { Staff: 'Complete staff profile', 'Fee Manager': 'Complete fee transaction details', 'Exam Manager': 'Complete exam details', Attendance: 'Complete attendance details', Transport: 'Complete transport route details', Communication: 'Complete message details', Complaints: 'Complete complaint details', Reports: 'Complete report details' };
-function App() { const [active, setActive] = useState('Dashboard'), [modal, setModal] = useState(null), [toast, setToast] = useState(''), [setting, setSetting] = useState('Academic Years'); const notify = m => { setToast(m); setTimeout(() => setToast(''), 2600); }; const openDetail = (section, i) => section === 'Students' ? setModal({ type: 'student', student: students[i] || students[0] }) : setModal({ type: 'detail', section, row: rows[section][i], columns: cols[section] }); return React.createElement("div", { className: "app" },
+const baseRows = { Students: [['VJC-2026-001', 'Aarav Sharma', 'Junior Inter', 'MPC', '98765 43210', 'Active'], ['VJC-2026-002', 'Diya Reddy', 'Junior Inter', 'BiPC', '98765 12340', 'Active'], ['VJC-2026-003', 'Kabir Rao', 'Senior Inter', 'MEC', '98490 77881', 'Active'], ['VJC-2026-004', 'Ananya Iyer', 'Senior Inter', 'CEC', '99887 22116', 'Active']], Staff: [['STF-014', 'Dr. R. Mehta', 'Sciences', 'Physics', 'Active'], ['STF-021', 'Ms. S. Nair', 'Sciences', 'Chemistry', 'Active']], 'Fee Manager': [['VJC-R-1048', 'Aarav Sharma', 'INR 48,000', 'INR 13,000', 'UPI'], ['VJC-R-1047', 'Diya Reddy', 'INR 52,000', 'INR 0', 'Bank Transfer']], 'Exam Manager': [['Unit Test I', 'Junior Inter', 'Mathematics', '08 Jul 2026', 'Scheduled'], ['Quarterly', 'Senior Inter', 'Economics', '22 Aug 2026', 'Draft']], Attendance: [['Aarav Sharma', '101', 'Junior Inter', '20 / 22', '91%'], ['Diya Reddy', '102', 'Junior Inter', '21 / 22', '95%'], ['Kabir Rao', '205', 'Senior Inter', '18 / 22', '82%']], Transport: [['TS 09 AB 4421', 'M. Ramesh', 'Kukatpally', '8 stops', '42 students'], ['TS 10 CD 8310', 'K. Anand', 'Miyapur', '11 stops', '38 students']], Communication: [['Quarterly exam schedule', 'All Students', 'Principal', '25 Jun 2026', 'Sent'], ['Fee payment reminder', 'Junior Inter A', 'Accounts', '23 Jun 2026', 'Sent']], Complaints: [['CMP-028', 'Student 102', 'Library access card', '25 Jun 2026', 'Processing'], ['CMP-027', 'Staff STF-021', 'Lab equipment request', '24 Jun 2026', 'Pending']], Reports: [['Fee Collection Summary', 'Fees', 'June 2026', 'PDF / Excel'], ['Student Attendance', 'Attendance', 'June 2026', 'PDF / Print'], ['Class-wise Performance', 'Exams', 'Quarterly', 'PDF / Excel']] };
+const subtitles = { Students: 'Complete student profile', Staff: 'Complete staff profile', 'Fee Manager': 'Complete fee transaction details', 'Exam Manager': 'Complete exam details', Attendance: 'Complete attendance details', Transport: 'Complete transport route details', Communication: 'Complete message details', Complaints: 'Complete complaint details', Reports: 'Complete report details' };
+function App() { const [active, setActive] = useState('Dashboard'), [data, setData] = useState(baseRows), [modal, setModal] = useState(null), [toast, setToast] = useState(''), [setting, setSetting] = useState('Academic Years'); const notify = m => { setToast(m); setTimeout(() => setToast(''), 2800); }; const addRow = (section, row) => setData(d => ({ ...d, [section]: [row, ...d[section]] })); const updateRow = (section, index, row) => setData(d => ({ ...d, [section]: d[section].map((r, i) => i === index ? row : r) })); const deleteRow = (section, index) => setData(d => ({ ...d, [section]: d[section].filter((_, i) => i !== index) })); const replaceRows = (section, rows) => setData(d => ({ ...d, [section]: rows })); return React.createElement("div", { className: "app" },
     React.createElement("aside", { className: "sidebar" },
         React.createElement("div", { className: "brand" },
             React.createElement("div", { className: "logo" }, "V"),
@@ -14,7 +13,7 @@ function App() { const [active, setActive] = useState('Dashboard'), [modal, setM
                 React.createElement("b", null, "VALUES"),
                 React.createElement("span", null, "JUNIOR COLLEGE"))),
         React.createElement("nav", null, NAV.map(n => React.createElement("button", { key: n, onClick: () => setActive(n), className: active === n ? 'on' : '' },
-            React.createElement("strong", null, initials[n]),
+            React.createElement("strong", null, icons[n]),
             React.createElement("span", null, n))))),
     React.createElement("main", null,
         React.createElement("header", null,
@@ -24,23 +23,17 @@ function App() { const [active, setActive] = useState('Dashboard'), [modal, setM
             React.createElement("div", { className: "headActions" },
                 React.createElement("button", { onClick: () => setModal({ type: 'notifications' }) }, "Notifications"),
                 React.createElement("button", { onClick: () => setModal({ type: 'admin' }) }, "AS\u00A0 Admin"))),
-        React.createElement("section", { className: "content" }, active === 'Dashboard' ? React.createElement(Dashboard, { setActive: setActive }) : active === 'Admin Settings' ? React.createElement(Settings, { setting: setting, setSetting: setSetting, notify: notify }) : React.createElement(Module, { name: active, setModal: setModal, notify: notify, openDetail: openDetail }))),
-    modal?.type === 'add' && React.createElement(AddModal, { title: modal.title, close: () => setModal(null), notify: notify }),
-    " ",
-    modal?.type === 'student' && React.createElement(StudentModal, { student: modal.student, close: () => setModal(null), notify: notify }),
-    " ",
-    modal?.type === 'detail' && React.createElement(DetailModal, { section: modal.section, row: modal.row, columns: modal.columns, close: () => setModal(null), notify: notify }),
-    " ",
+        React.createElement("section", { className: "content" }, active === 'Dashboard' ? React.createElement(Dashboard, { data: data, setActive: setActive }) : active === 'Admin Settings' ? React.createElement(Settings, { setting: setting, setSetting: setSetting, notify: notify }) : React.createElement(Module, { name: active, rows: data[active], setModal: setModal, notify: notify, replaceRows: replaceRows }))),
+    modal?.type === 'add' && React.createElement(EditModal, { mode: "add", section: modal.section, row: Array(cols[modal.section].length).fill(''), close: () => setModal(null), onSave: row => { addRow(modal.section, row); notify(modal.section + ' record added'); } }),
+    modal?.type === 'detail' && React.createElement(EditModal, { mode: "edit", section: modal.section, row: modal.row, close: () => setModal(null), onSave: row => { updateRow(modal.section, modal.index, row); notify(modal.section + ' record updated'); }, onDelete: () => { deleteRow(modal.section, modal.index); notify(modal.section + ' record deleted'); } }),
     modal?.type === 'notifications' && React.createElement(InfoModal, { title: "Notifications", close: () => setModal(null), footer: React.createElement("button", { onClick: () => setModal(null) }, "Close") },
         React.createElement("p", null, "No urgent alerts right now."),
         React.createElement("p", null, "Fee reminders and exam notices are ready in Communication.")),
-    " ",
     modal?.type === 'admin' && React.createElement(InfoModal, { title: "AS Admin", close: () => setModal(null), footer: React.createElement("button", { onClick: () => setModal(null) }, "Close") },
         React.createElement("p", null, "Signed in as Super Admin."),
         React.createElement("p", null, "Profile and account controls are ready.")),
-    " ",
     toast && React.createElement("div", { className: "toast" }, toast)); }
-function Dashboard({ setActive }) { const stats = [['4', 'Total Students'], ['2', 'Total Staff'], ['INR 42.8L', 'Fee Collection'], ['INR 8.4L', 'Pending Fees'], ['92.4%', 'Today Attendance'], ['2', 'Messages'], ['2', 'Complaints']]; return React.createElement(React.Fragment, null,
+function Dashboard({ data, setActive }) { const stats = [['' + data.Students.length, 'Total Students'], ['' + data.Staff.length, 'Total Staff'], ['INR ' + (data['Fee Manager'].length * 21.4).toFixed(1) + 'L', 'Fee Collection'], ['INR ' + (data['Fee Manager'].filter(r => !String(r[3]).includes('0')).length * 4.2).toFixed(1) + 'L', 'Pending Fees'], [avgAttendance(data.Attendance), 'Today Attendance'], ['' + data.Communication.length, 'Messages'], ['' + data.Complaints.length, 'Complaints']]; return React.createElement(React.Fragment, null,
     React.createElement("div", { className: "intro" },
         React.createElement("b", null, "26 June 2026"),
         React.createElement("h2", null, "Good morning, Admin."),
@@ -51,7 +44,7 @@ function Dashboard({ setActive }) { const stats = [['4', 'Total Students'], ['2'
     React.createElement("div", { className: "gridTwo" },
         React.createElement("div", { className: "card chart" },
             React.createElement("h3", null, "Fee Collection Overview"),
-            React.createElement("div", { className: "bars" }, [36, 50, 44, 58, 68, 62, 75].map((h, i) => React.createElement("span", { key: i, style: { height: h + '%' } })))),
+            React.createElement("div", { className: "bars" }, data['Fee Manager'].map((_, i) => React.createElement("span", { key: i, style: { height: Math.min(88, 38 + i * 10) + '%' } })))),
         React.createElement("div", { className: "card quick" },
             React.createElement("h3", null, "Quick Actions"),
             React.createElement("div", null,
@@ -61,15 +54,68 @@ function Dashboard({ setActive }) { const stats = [['4', 'Total Students'], ['2'
                 React.createElement("button", { onClick: () => setActive('Communication') }, "Send Notice")))),
     React.createElement("div", { className: "card recent" },
         React.createElement("h3", null, "Recent Activity"),
-        ['Fee payment received - INR 24,500 from Aarav Sharma', 'New student admitted - Diya Reddy', 'Attendance submitted - Senior Inter A', 'Complaint resolved - Library access card'].map(x => React.createElement("p", { key: x }, x)))); }
-function exportCsv(name, data) { const csv = [cols[name].join(','), ...data.map(row => row.map(cell => '"' + String(cell).replaceAll('"', '""') + '"').join(','))].join('\n'); const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name.toLowerCase().replaceAll(' ', '-') + '-export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
-function Module({ name, setModal, notify, openDetail }) { const data = rows[name] || []; const importRef = useRef(null); const handleImport = e => { const file = e.target.files?.[0]; if (!file)
-    return; const ok = /\.(xlsx|xls|csv)$/i.test(file.name); notify(ok ? file.name + ' selected for ' + name + ' import' : 'Please choose an Excel or CSV file'); e.target.value = ''; }; return React.createElement(React.Fragment, null,
+        ['Live lists and dashboard counts now update after add, import, edit and delete.', 'Fee payment records: ' + data['Fee Manager'].length, 'Student records: ' + data.Students.length, 'Complaints records: ' + data.Complaints.length].map(x => React.createElement("p", { key: x }, x)))); }
+function avgAttendance(rows) { const nums = rows.map(r => parseFloat(String(r[4]).replace('%', ''))).filter(n => !Number.isNaN(n)); return nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1) + '%' : '0%'; }
+function exportCsv(name, rows) { const csv = [cols[name].join(','), ...rows.map(row => row.map(cell => '"' + String(cell ?? '').replaceAll('"', '""') + '"').join(','))].join('\n'); const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name.toLowerCase().replaceAll(' ', '-') + '-export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
+function parseCsv(text) { const rows = []; let row = [], cell = '', q = false; for (let i = 0; i < text.length; i++) {
+    const ch = text[i], next = text[i + 1];
+    if (ch === '"' && q && next === '"') {
+        cell += '"';
+        i++;
+    }
+    else if (ch === '"') {
+        q = !q;
+    }
+    else if (ch === ',' && !q) {
+        row.push(cell);
+        cell = '';
+    }
+    else if ((ch === '\n' || ch === '\r') && !q) {
+        if (ch === '\r' && next === '\n')
+            i++;
+        row.push(cell);
+        if (row.some(v => v.trim()))
+            rows.push(row);
+        row = [];
+        cell = '';
+    }
+    else
+        cell += ch;
+} row.push(cell); if (row.some(v => v.trim()))
+    rows.push(row); return rows; }
+async function readImportFile(file) { if (/\.csv$/i.test(file.name)) {
+    return parseCsv(await file.text());
+} if (window.XLSX) {
+    const buf = await file.arrayBuffer();
+    const wb = window.XLSX.read(buf, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    return window.XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+} throw new Error('Excel reader is still loading. Try again in a moment.'); }
+function normalizeImport(section, matrix) { const expected = cols[section]; let rows = matrix.filter(r => r.some(v => String(v).trim())); if (!rows.length)
+    return []; const first = rows[0].map(v => String(v).trim().toLowerCase()); const hasHeader = expected.some(c => first.includes(c.toLowerCase())); if (hasHeader)
+    rows = rows.slice(1); return rows.map(r => expected.map((_, i) => String(r[i] ?? '').trim())).filter(r => r.some(Boolean)); }
+function Module({ name, rows, setModal, notify, replaceRows }) { const importRef = useRef(null); const handleImport = async (e) => { const file = e.target.files?.[0]; e.target.value = ''; if (!file)
+    return; if (!/\.(xlsx|xls|csv)$/i.test(file.name)) {
+    notify('Please upload .xlsx, .xls or .csv only');
+    return;
+} try {
+    const matrix = await readImportFile(file);
+    const imported = normalizeImport(name, matrix);
+    if (!imported.length) {
+        notify('No usable rows found in ' + file.name);
+        return;
+    }
+    replaceRows(name, imported);
+    notify(imported.length + ' ' + name + ' records imported from ' + file.name);
+}
+catch (err) {
+    notify(err.message || 'Import failed');
+} }; return React.createElement(React.Fragment, null,
     React.createElement("div", { className: "moduleHead" },
         React.createElement("div", null,
             React.createElement("h2", null, name),
             React.createElement("p", null, name === 'Reports' ? 'Consolidated academic, financial and operational reports.' : 'Add, view, search and manage ' + name.toLowerCase() + '.')),
-        name !== 'Reports' && React.createElement("button", { className: "primary", onClick: () => setModal({ type: 'add', title: 'Add ' + name }) }, "Add New")),
+        name !== 'Reports' && React.createElement("button", { className: "primary", onClick: () => setModal({ type: 'add', section: name }) }, "Add New")),
     React.createElement("div", { className: "card tableCard" },
         React.createElement("div", { className: "tools" },
             React.createElement("input", { placeholder: name === 'Students' ? 'Search by name, ID or mobile' : 'Search ' + name.toLowerCase() }),
@@ -79,21 +125,21 @@ function Module({ name, setModal, notify, openDetail }) { const data = rows[name
                 React.createElement("option", null, "Senior Inter")),
             React.createElement("input", { ref: importRef, className: "fileInput", type: "file", accept: ".xlsx,.xls,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv", onChange: handleImport }),
             React.createElement("button", { onClick: () => importRef.current?.click() }, "Import Excel"),
-            React.createElement("button", { onClick: () => { exportCsv(name, data); notify(name + ' export downloaded'); } }, "Export Excel")),
+            React.createElement("button", { onClick: () => { exportCsv(name, rows); notify(name + ' export downloaded'); } }, "Export Excel")),
         React.createElement("table", null,
             React.createElement("thead", null,
                 React.createElement("tr", null,
-                    (cols[name] || []).map(c => React.createElement("th", { key: c }, c)),
+                    cols[name].map(c => React.createElement("th", { key: c }, c)),
                     React.createElement("th", null, "Action"))),
-            React.createElement("tbody", null, data.map((r, i) => React.createElement("tr", { key: i },
+            React.createElement("tbody", null, rows.map((r, i) => React.createElement("tr", { key: i },
                 r.map((c, j) => React.createElement("td", { key: j }, c)),
                 React.createElement("td", null,
-                    React.createElement("button", { className: "dots", title: name + ' details', "aria-label": name + ' details', onClick: () => openDetail(name, i) }, "...")))))),
+                    React.createElement("button", { className: "dots", title: name + ' details', "aria-label": name + ' details', onClick: () => setModal({ type: 'detail', section: name, row: r, index: i }) }, "...")))))),
         React.createElement("div", { className: "showing" },
             "Showing ",
-            data.length,
+            rows.length,
             " of ",
-            data.length))); }
+            rows.length))); }
 function Settings({ setting, setSetting, notify }) { return React.createElement(React.Fragment, null,
     React.createElement("div", { className: "moduleHead" },
         React.createElement("div", null,
@@ -138,45 +184,21 @@ function InfoModal({ title, children, close, footer }) { return React.createElem
             React.createElement("button", { className: "x", onClick: close }, "x")),
         React.createElement("div", { className: "dialogBody" }, children),
         React.createElement("footer", null, footer))); }
-function DetailModal({ section, row, columns, close, notify }) { const title = row?.[1] || row?.[0] || section; return React.createElement("div", { className: "overlay" },
+function EditModal({ mode, section, row, close, onSave, onDelete }) { const [values, setValues] = useState(row); const title = mode === 'add' ? 'Add ' + section : (values[1] || values[0] || section); return React.createElement("div", { className: "overlay" },
     React.createElement("div", { className: "dialog studentDialog" },
         React.createElement("div", { className: "dialogHead" },
             React.createElement("div", null,
                 React.createElement("h3", null, title),
-                React.createElement("p", null, subtitles[section] || ('Complete ' + section.toLowerCase() + ' details'))),
+                React.createElement("p", null, mode === 'add' ? 'Create new ' + section.toLowerCase() + ' record' : subtitles[section])),
             React.createElement("button", { className: "x", onClick: close }, "x")),
-        React.createElement("div", { className: "detailGrid" }, columns.map((c, i) => React.createElement("div", { className: "detail", key: c },
+        React.createElement("div", { className: "detailGrid" }, cols[section].map((c, i) => React.createElement("label", { className: "detail edit", key: c },
             React.createElement("b", null, c.toUpperCase()),
-            React.createElement("span", null, row[i])))),
+            React.createElement("input", { value: values[i] ?? '', onChange: e => setValues(v => v.map((x, j) => j === i ? e.target.value : x)) })))),
         React.createElement("footer", null,
-            React.createElement("button", { className: "danger", onClick: () => notify(section + ' delete action opened') },
+            mode === 'edit' && React.createElement("button", { className: "danger", onClick: () => { onDelete(); close(); } },
                 "Delete ",
                 section.replace(' Manager', '')),
-            React.createElement("button", { onClick: close }, "Close")))); }
-function StudentModal({ student, close, notify }) { const fields = [['STUDENT ID', student.id], ['ADMISSION NUMBER', student.admission], ['ROLL NUMBER', student.roll], ['CLASS', student.class], ['SECTION', student.section], ['COURSE', student.course], ['MOBILE', student.mobile], ['EMAIL', student.email], ['DATE OF BIRTH', student.dob], ['PARENT / GUARDIAN', student.guardian], ['PARENT MOBILE', student.parentMobile], ['ADDRESS', student.address], ['STATUS', student.status]]; return React.createElement("div", { className: "overlay" },
-    React.createElement("div", { className: "dialog studentDialog" },
-        React.createElement("div", { className: "dialogHead" },
-            React.createElement("div", null,
-                React.createElement("h3", null, student.name),
-                React.createElement("p", null, "Complete student profile")),
-            React.createElement("button", { className: "x", onClick: close }, "x")),
-        React.createElement("div", { className: "detailGrid" }, fields.map(([k, v]) => React.createElement("div", { className: "detail", key: k },
-            React.createElement("b", null, k),
-            React.createElement("span", null, v)))),
-        React.createElement("footer", null,
-            React.createElement("button", { className: "danger", onClick: () => notify('Delete student action opened') }, "Delete Student"),
-            React.createElement("button", { onClick: close }, "Close")))); }
-function AddModal({ title, close, notify }) { return React.createElement("div", { className: "overlay" },
-    React.createElement("div", { className: "dialog" },
-        React.createElement("div", { className: "dialogHead" },
-            React.createElement("div", null,
-                React.createElement("h3", null, title)),
-            React.createElement("button", { className: "x", onClick: close }, "x")),
-        React.createElement("div", { className: "form modalForm" }, ['Name / Title', 'Reference Number', 'Class / Department', 'Mobile Number', 'Email', 'Status'].map(f => React.createElement("label", { key: f },
-            f,
-            React.createElement("input", null)))),
-        React.createElement("footer", null,
-            React.createElement("button", { onClick: close }, "Cancel"),
-            React.createElement("button", { className: "primary", onClick: () => { notify('Record saved successfully'); close(); } }, "Save Record")))); }
+            React.createElement("button", { onClick: close }, "Close"),
+            React.createElement("button", { className: "primary", onClick: () => { onSave(values); close(); } }, "Save")))); }
 
 const root=ReactDOM.createRoot(document.getElementById('root'));root.render(React.createElement(App));
