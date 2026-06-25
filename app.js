@@ -81,7 +81,7 @@ function Module({ name, setModal, notify }) { const data = rows[name] || []; ret
             React.createElement("tbody", null, data.map((r, i) => React.createElement("tr", { key: i },
                 r.map((c, j) => React.createElement("td", { key: j }, c)),
                 React.createElement("td", null,
-                    React.createElement("button", { onClick: () => notify('Opened record details') }, "View")))))))); }
+                    React.createElement("button", { className: "dots", title: "Student details", "aria-label": "Student details", onClick: () => notify('Opened record details') }, "...")))))))); }
 function Settings({ setting, setSetting, notify }) { return React.createElement(React.Fragment, null,
     React.createElement("div", { className: "moduleHead" },
         React.createElement("div", null,
