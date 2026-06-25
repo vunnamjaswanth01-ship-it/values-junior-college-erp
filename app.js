@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom/client';
 import React, { useState } from 'react';
 import { LayoutDashboard, Settings, GraduationCap, Users, WalletCards, ClipboardCheck, CalendarCheck, Bus, MessageSquareText, ShieldAlert, BarChart3, Bell, Menu, X, Plus, Search, Download, Upload, IndianRupee, ChevronDown, LockKeyhole, Mail, Eye, EyeOff, UserPlus, Receipt, BellRing, MoreHorizontal } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
