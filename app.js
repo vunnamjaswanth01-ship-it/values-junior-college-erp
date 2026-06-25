@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom/client';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 const NAV = ['Dashboard', 'Admin Settings', 'Students', 'Staff', 'Fee Manager', 'Exam Manager', 'Attendance', 'Transport', 'Communication', 'Complaints', 'Reports'];
 const icons = { Dashboard: '▦', 'Admin Settings': '⚙', Students: '🎓', Staff: '👥', 'Fee Manager': '₹', 'Exam Manager': '✓', Attendance: '📅', Transport: '🚌', Communication: '✉', Complaints: '⚠', Reports: '▤' };
 const cols = { Students: ['Student ID', 'Name', 'Class', 'Course', 'Mobile', 'Status'], Staff: ['Staff ID', 'Name', 'Department', 'Subject', 'Status'], 'Fee Manager': ['Receipt', 'Student', 'Total', 'Balance', 'Mode'], 'Exam Manager': ['Exam', 'Class', 'Subject', 'Date', 'Status'], Attendance: ['Student', 'Roll', 'Class', 'Present', 'Percentage'], Transport: ['Bus', 'Driver', 'Route', 'Stops', 'Students'], Communication: ['Subject', 'Audience', 'Sender', 'Date', 'Status'], Complaints: ['ID', 'Raised By', 'Subject', 'Date', 'Status'], Reports: ['Report', 'Module', 'Period', 'Formats'] };
@@ -33,7 +33,8 @@ function App() { const [active, setActive] = useState('Dashboard'), [data, setDa
         React.createElement("p", null, "Signed in as Super Admin."),
         React.createElement("p", null, "Profile and account controls are ready.")),
     toast && React.createElement("div", { className: "toast" }, toast)); }
-function Dashboard({ data, setActive }) { const stats = [['' + data.Students.length, 'Total Students'], ['' + data.Staff.length, 'Total Staff'], ['INR ' + (data['Fee Manager'].length * 21.4).toFixed(1) + 'L', 'Fee Collection'], ['INR ' + (data['Fee Manager'].filter(r => !String(r[3]).includes('0')).length * 4.2).toFixed(1) + 'L', 'Pending Fees'], [avgAttendance(data.Attendance), 'Today Attendance'], ['' + data.Communication.length, 'Messages'], ['' + data.Complaints.length, 'Complaints']]; return React.createElement(React.Fragment, null,
+function moneyValue(v) { const n = parseFloat(String(v || '').replace(/[^0-9.]/g, '')); return Number.isNaN(n) ? 0 : n; }
+function Dashboard({ data, setActive }) { const feeRows = data['Fee Manager']; const collected = feeRows.reduce((s, r) => s + moneyValue(r[2]), 0); const pending = feeRows.reduce((s, r) => s + moneyValue(r[3]), 0); const stats = [['' + data.Students.length, 'Total Students'], ['' + data.Staff.length, 'Total Staff'], ['INR ' + (collected / 100000).toFixed(1) + 'L', 'Fee Collection'], ['INR ' + (pending / 100000).toFixed(1) + 'L', 'Pending Fees'], [avgAttendance(data.Attendance), 'Today Attendance'], ['' + data.Communication.length, 'Messages'], ['' + data.Complaints.length, 'Complaints']]; return React.createElement(React.Fragment, null,
     React.createElement("div", { className: "intro" },
         React.createElement("b", null, "26 June 2026"),
         React.createElement("h2", null, "Good morning, Admin."),
@@ -56,7 +57,7 @@ function Dashboard({ data, setActive }) { const stats = [['' + data.Students.len
         React.createElement("h3", null, "Recent Activity"),
         ['Live lists and dashboard counts now update after add, import, edit and delete.', 'Fee payment records: ' + data['Fee Manager'].length, 'Student records: ' + data.Students.length, 'Complaints records: ' + data.Complaints.length].map(x => React.createElement("p", { key: x }, x)))); }
 function avgAttendance(rows) { const nums = rows.map(r => parseFloat(String(r[4]).replace('%', ''))).filter(n => !Number.isNaN(n)); return nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1) + '%' : '0%'; }
-function exportCsv(name, rows) { const csv = [cols[name].join(','), ...rows.map(row => row.map(cell => '"' + String(cell ?? '').replaceAll('"', '""') + '"').join(','))].join('\n'); const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name.toLowerCase().replaceAll(' ', '-') + '-export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
+function exportExcel(name, rows) { const header = cols[name].map(c => '<th>' + String(c).replaceAll('&', '&amp;').replaceAll('<', '&lt;') + '</th>').join(''); const body = rows.map(row => '<tr>' + row.map(cell => '<td>' + String(cell ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;') + '</td>').join('') + '</tr>').join(''); const html = '<html><head><meta charset="UTF-8"></head><body><table><thead><tr>' + header + '</tr></thead><tbody>' + body + '</tbody></table></body></html>'; const blob = new Blob([html], { type: 'application/vnd.ms-excel' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name.toLowerCase().replaceAll(' ', '-') + '-export.xls'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
 function parseCsv(text) { const rows = []; let row = [], cell = '', q = false; for (let i = 0; i < text.length; i++) {
     const ch = text[i], next = text[i + 1];
     if (ch === '"' && q && next === '"') {
@@ -94,7 +95,7 @@ async function readImportFile(file) { if (/\.csv$/i.test(file.name)) {
 function normalizeImport(section, matrix) { const expected = cols[section]; let rows = matrix.filter(r => r.some(v => String(v).trim())); if (!rows.length)
     return []; const first = rows[0].map(v => String(v).trim().toLowerCase()); const hasHeader = expected.some(c => first.includes(c.toLowerCase())); if (hasHeader)
     rows = rows.slice(1); return rows.map(r => expected.map((_, i) => String(r[i] ?? '').trim())).filter(r => r.some(Boolean)); }
-function Module({ name, rows, setModal, notify, replaceRows }) { const importRef = useRef(null); const handleImport = async (e) => { const file = e.target.files?.[0]; e.target.value = ''; if (!file)
+function Module({ name, rows, setModal, notify, replaceRows }) { const importRef = useRef(null); const [query, setQuery] = useState(''); const [klass, setKlass] = useState('All Classes'); const classIndex = cols[name].findIndex(c => c === 'Class'); const visibleRows = useMemo(() => rows.filter(row => { const matchesQuery = !query || row.some(v => String(v).toLowerCase().includes(query.toLowerCase())); const matchesClass = klass === 'All Classes' || classIndex < 0 || row[classIndex] === klass; return matchesQuery && matchesClass; }), [rows, query, klass, name]); const handleImport = async (e) => { const file = e.target.files?.[0]; e.target.value = ''; if (!file)
     return; if (!/\.(xlsx|xls|csv)$/i.test(file.name)) {
     notify('Please upload .xlsx, .xls or .csv only');
     return;
@@ -106,6 +107,8 @@ function Module({ name, rows, setModal, notify, replaceRows }) { const importRef
         return;
     }
     replaceRows(name, imported);
+    setQuery('');
+    setKlass('All Classes');
     notify(imported.length + ' ' + name + ' records imported from ' + file.name);
 }
 catch (err) {
@@ -118,26 +121,26 @@ catch (err) {
         name !== 'Reports' && React.createElement("button", { className: "primary", onClick: () => setModal({ type: 'add', section: name }) }, "Add New")),
     React.createElement("div", { className: "card tableCard" },
         React.createElement("div", { className: "tools" },
-            React.createElement("input", { placeholder: name === 'Students' ? 'Search by name, ID or mobile' : 'Search ' + name.toLowerCase() }),
-            React.createElement("select", null,
+            React.createElement("input", { value: query, onChange: e => setQuery(e.target.value), placeholder: name === 'Students' ? 'Search by name, ID or mobile' : 'Search ' + name.toLowerCase() }),
+            React.createElement("select", { value: klass, onChange: e => setKlass(e.target.value) },
                 React.createElement("option", null, "All Classes"),
                 React.createElement("option", null, "Junior Inter"),
                 React.createElement("option", null, "Senior Inter")),
             React.createElement("input", { ref: importRef, className: "fileInput", type: "file", accept: ".xlsx,.xls,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv", onChange: handleImport }),
             React.createElement("button", { onClick: () => importRef.current?.click() }, "Import Excel"),
-            React.createElement("button", { onClick: () => { exportCsv(name, rows); notify(name + ' export downloaded'); } }, "Export Excel")),
+            React.createElement("button", { onClick: () => { exportExcel(name, visibleRows); notify(name + ' export downloaded'); } }, "Export Excel")),
         React.createElement("table", null,
             React.createElement("thead", null,
                 React.createElement("tr", null,
                     cols[name].map(c => React.createElement("th", { key: c }, c)),
                     React.createElement("th", null, "Action"))),
-            React.createElement("tbody", null, rows.map((r, i) => React.createElement("tr", { key: i },
+            React.createElement("tbody", null, visibleRows.map((r, i) => { const realIndex = rows.indexOf(r); return React.createElement("tr", { key: i },
                 r.map((c, j) => React.createElement("td", { key: j }, c)),
                 React.createElement("td", null,
-                    React.createElement("button", { className: "dots", title: name + ' details', "aria-label": name + ' details', onClick: () => setModal({ type: 'detail', section: name, row: r, index: i }) }, "...")))))),
+                    React.createElement("button", { className: "dots", title: name + ' details', "aria-label": name + ' details', onClick: () => setModal({ type: 'detail', section: name, row: r, index: realIndex }) }, "..."))); }))),
         React.createElement("div", { className: "showing" },
             "Showing ",
-            rows.length,
+            visibleRows.length,
             " of ",
             rows.length))); }
 function Settings({ setting, setSetting, notify }) { return React.createElement(React.Fragment, null,
